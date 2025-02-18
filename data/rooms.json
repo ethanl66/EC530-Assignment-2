@@ -1,0 +1,15 @@
+[
+    {
+        "room_id": 1,
+        "name": "Basement of John Doe",
+        "floor": 0,
+        "size": 300,
+        "dimensions": [
+            15,
+            20
+        ],
+        "room_type": "Basement",
+        "devices": [],
+        "house": 1
+    }
+]

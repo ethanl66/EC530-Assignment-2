@@ -1,0 +1,11 @@
+[
+    {
+        "house_id": 1,
+        "name": "Mansion of John Doe",
+        "address": "42 Cummington Mall",
+        "gps_coordinates": "123.456, 789.012",
+        "owners": 1,
+        "occupants": 1,
+        "rooms": []
+    }
+]

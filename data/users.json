@@ -1,0 +1,18 @@
+[
+    {
+        "user_id": 2,
+        "name": "Johnny Smither",
+        "username": "johnnysmither",
+        "phone": "123-555-7891",
+        "email": "janedoe@mail.com",
+        "houses": []
+    },
+    {
+        "user_id": 1,
+        "name": "John Doe",
+        "username": "johndoe",
+        "phone": "123-555-7890",
+        "email": "johndoe@mail.com",
+        "houses": []
+    }
+]
