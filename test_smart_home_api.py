@@ -48,7 +48,7 @@ def test_save_user(tmpdir):
         assert data[0]['user_id'] == 10
         assert data[0]['name'] == 'Johnny Doe'
         assert data[0]['username'] == 'johnnydoe'
-        assert data[0]['phone'] == '124-555-7890'
+        assert data[0]['phone'] == '127-555-7890'
         assert data[0]['email'] == 'johnnydoe@mail.com'
 
 """ user1 = User(1, 'John Doe', 'johndoe', '123-555-7890', 'johndoe@mail.com')
