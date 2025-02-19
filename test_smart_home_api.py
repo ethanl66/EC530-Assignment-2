@@ -51,7 +51,7 @@ def test_save_user(tmpdir):
         assert data[0]['phone'] == '124-555-7890'
         assert data[0]['email'] == 'johnnydoe@mail.com'
 
-user1 = User(1, 'John Doe', 'johndoe', '123-555-7890', 'johndoe@mail.com')
+""" user1 = User(1, 'John Doe', 'johndoe', '123-555-7890', 'johndoe@mail.com')
 user2 = User(2, 'Jane Doe', 'janedoe', '123-555-7891', 'janedoe@mail.com')
 user2.save_user()
 print_file('data/users.json')
@@ -179,3 +179,4 @@ print(room1.get_details())
 # Delete device from room
 room1.delete_device(device1)
 print(room1.get_details())
+ """
