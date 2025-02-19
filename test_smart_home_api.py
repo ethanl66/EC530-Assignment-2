@@ -45,7 +45,7 @@ def test_save_user(tmpdir):
     # Verify that the user has been saved correctly
     with open('data/users.json', 'r') as file:
         data = json.load(file)
-        assert data[0]['id'] == 10
+        assert data[0]['user_id'] == 10
         assert data[0]['name'] == 'Johnny Doe'
         assert data[0]['username'] == 'johnnydoe'
         assert data[0]['phone'] == '124-555-7890'
