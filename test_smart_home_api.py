@@ -37,7 +37,7 @@ def test_create_user():
 
 def test_save_user(tmpdir):
     # Create a user
-    user = User(10, 'Johnny Doe', 'johnnydoe', '127-555-7890', 'johnydoe@mail.com')
+    user = User(10, 'Johnny Doe', 'johnnydoe', '127-555-7890', 'johnnydoe@mail.com')
     
     # Save the user
     user.save_user()
