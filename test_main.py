@@ -12,3 +12,22 @@ def test_add_user():
     )
     assert response.status_code == 200
     assert response.json() == {"name": "God", "email": "god@church.com"}
+
+def test_add_user_invalid():
+    response = client.post(
+        "/users/",
+        json = {"name": "God"}
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "email"
+                ],
+                "msg": "field required",
+                "type": "value_error.missing"
+            }
+        ]
+    }
