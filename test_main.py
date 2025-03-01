@@ -5,7 +5,7 @@ from main import *
 client = TestClient(app)
 
 # Test User CRUD operations
-def test_add_user():
+def test_create_user():
     response = client.post(
         "/users/",
         json = {"name": "God", "email": "god@church.com"}
@@ -65,5 +65,20 @@ def test_get_user_by_id():
       'houses': [],
     }
 
+def test_update_user(): 
+    response = client.put(
+        "/users/1",
+        json = {"name": "Jesus", "email": "son@church.com"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        'id': 1,
+        'name': 'Jesus',
+        'email': 'son@church.com',
+        'houses': [],
+    }
 
-  
+def test_delete_user():
+    response = client.delete("/users/1")
+    assert response.status_code == 200
+    assert response.json() == {"message": "User deleted successfully"}
