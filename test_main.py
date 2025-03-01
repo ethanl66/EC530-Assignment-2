@@ -52,7 +52,7 @@ def test_get_users():
             'id': 1,
             'name': 'God',
             'email': 'god@church.com',
-            'houses': [],
+            'houses_ids': [],
         }
     ]
 
@@ -63,7 +63,7 @@ def test_get_user_by_id():
       'id': 1,
       'name': 'God',
       'email': 'god@church.com',
-      'houses': [],
+      'houses_ids': [],
     }
 
 def test_update_user(): 
@@ -73,10 +73,11 @@ def test_update_user():
     )
     assert response.status_code == 200
     assert response.json() == {
-        "name": "Eve",
-        "email": "eve@earth.com",
-        "houses_ids": [1, 2]
-    }
+        'id': 1,
+        'name': 'Jesus',
+        'email': 'son@church.com',
+        'houses_ids': [],
+    }         
 
 def test_delete_user():
     response = client.delete("/users/1")
@@ -99,10 +100,10 @@ def test_create_house():
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id":1,
-        "address":"1 Heaven St.",
-        "owner_id":1,
-        "residents_ids":[1,2]
+        "id": 1,
+        "address": "1 Heaven St.",
+        "owner_id": 1,
+        "residents_ids": [1,2]
     }
 
 def test_get_houses():
@@ -110,10 +111,10 @@ def test_get_houses():
     assert response.status_code == 200
     assert response.json() == [
         {
-            "id":1,
-            "address":"1 Heaven St.",
-            "owner_id":1,
-            "residents_ids":[1,2]
+            "id": 1,
+            "address": "1 Heaven St.",
+            "owner_id": 1,
+            "residents_ids": [1,2]
         }
     ]
 
@@ -121,10 +122,10 @@ def test_get_house_by_id():
     response = client.get("/houses/1")
     assert response.status_code == 200
     assert response.json() == {
-        "id":1,
-        "address":"1 Heaven St.",
-        "owner_id":1,
-        "residents_ids":[1,2]
+        "id": 1,
+        "address": "1 Heaven St.",
+        "owner_id": 1,
+        "residents_ids": [1,2]
     }
 
 def test_update_house():
@@ -153,7 +154,7 @@ def test_delete_house():
 
 
 def test_add_house_to_user():
-    response = client.post(
+    response = client.put(
         "/users/1",
         json = {
             "name": "Eve",
@@ -170,13 +171,19 @@ def test_add_house_to_user():
     }
 
 def test_get_houses_by_user():
-    response = client.get("/users/1/houses")
+    response = client.get("/users/2/houses")
     assert response.status_code == 200
     assert response.json() == [
         {
             "id": 1,
             "address": "1 Heaven St.",
-            "owner_id": 1,
-            "residents_ids": [1, 2]
+            "owner_id": 2,
+            "residents_ids": [
+                2
+            ]
         }
     ]
+def test_get_houses_by_poor_user():
+    response = client.get("/users/1/houses")
+    assert response.status_code == 200
+    assert response.json() == []
