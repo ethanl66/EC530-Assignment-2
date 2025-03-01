@@ -73,10 +73,9 @@ def test_update_user():
     )
     assert response.status_code == 200
     assert response.json() == {
-        'id': 1,
-        'name': 'Jesus',
-        'email': 'son@church.com',
-        'houses': [],
+        "name": "Eve",
+        "email": "eve@earth.com",
+        "houses_ids": [1, 2]
     }
 
 def test_delete_user():
@@ -149,3 +148,23 @@ def test_delete_house():
     response = client.delete("/houses/1")
     assert response.status_code == 200
     assert response.json() == {"message": "House deleted successfully"}
+
+# Add more invalid input cases
+
+
+def test_add_house_to_user():
+    response = client.post(
+        "/users/1/houses/",
+        json = {
+            "name": "Eve",
+            "email": "eve@earth.com",
+            "houses_ids": [1, 2]
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Eve",
+        "email": "eve@earth.com",
+        "houses_ids": [1, 2]
+    }
