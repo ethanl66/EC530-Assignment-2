@@ -154,7 +154,7 @@ def test_delete_house():
 
 def test_add_house_to_user():
     response = client.post(
-        "/users/1/houses/",
+        "/users/1",
         json = {
             "name": "Eve",
             "email": "eve@earth.com",
@@ -168,3 +168,15 @@ def test_add_house_to_user():
         "email": "eve@earth.com",
         "houses_ids": [1, 2]
     }
+
+def test_get_houses_by_user():
+    response = client.get("/users/1/houses")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "address": "1 Heaven St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    ]
