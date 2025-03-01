@@ -11,7 +11,12 @@ def test_add_user():
         json = {"name": "God", "email": "god@church.com"}
     )
     assert response.status_code == 200
-    assert response.json() == {"name": "God", "email": "god@church.com"}
+    assert response.json() == {
+        'id': 1,
+        'name': 'God',
+        'email': 'god@church.com',
+        'houses': [],
+    }
 
 def test_add_user_invalid():
     response = client.post(
@@ -20,24 +25,44 @@ def test_add_user_invalid():
     )
     assert response.status_code == 422
     assert response.json() == {
-        "detail": [
+        'detail': [
             {
-                "loc": [
-                    "body",
-                    "email"
+                'input': {
+                    'name': 'God',
+                },
+                'loc': [
+                    'body',
+                    'email',
                 ],
-                "msg": "field required",
-                "type": "value_error.missing"
-            }
+                'msg': 'field required',
+                'msg': 'Field required',
+                'type': 'value_error.missing',
+                'type': 'missing',
+            },
         ]
-    }
+    }        
+  
 
 def test_get_users():
     response = client.get("/users/")
     assert response.status_code == 200
-    assert response.json() == [{"name": "God", "email": "god@church.com"}]
+    assert response.json() == [
+        {
+            'id': 1,
+            'name': 'God',
+            'email': 'god@church.com',
+            'houses': [],
+        }
+    ]
 
 def test_get_user_by_id():
     response = client.get("/users/1")
     assert response.status_code == 200
-    assert response.json() == [{"name": "God", "email": "god@church.com"}]
+    assert response.json() == [
+        {
+            'id': 1,
+            'name': 'God',
+            'email': 'god@church.com',
+            'houses': [],
+        }
+    ]
