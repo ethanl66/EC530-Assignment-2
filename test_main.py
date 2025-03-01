@@ -58,11 +58,12 @@ def test_get_users():
 def test_get_user_by_id():
     response = client.get("/users/1")
     assert response.status_code == 200
-    assert response.json() == [
-        {
-            'id': 1,
-            'name': 'God',
-            'email': 'god@church.com',
-            'houses': [],
-        }
-    ]
+    assert response.json() == {
+      'id': 1,
+      'name': 'God',
+      'email': 'god@church.com',
+      'houses': [],
+    }
+
+
+  
