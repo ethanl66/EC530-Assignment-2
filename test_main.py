@@ -31,3 +31,8 @@ def test_add_user_invalid():
             }
         ]
     }
+
+def test_get_users():
+    response = client.get("/users/")
+    assert response.status_code == 200
+    assert response.json() == [{"name": "God", "email": "god@church.com"}]
