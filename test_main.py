@@ -16,7 +16,7 @@ def test_create_user():
         'id': 1,
         'name': 'God',
         'email': 'god@church.com',
-        'houses': [],
+        'houses_ids': [],
     }
 
 def test_add_user_invalid():
