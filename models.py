@@ -5,7 +5,7 @@ class User(BaseModel):
     id: Optional[int] = None
     name: str
     email: str
-    houses: List['House'] = []  # forward reference
+    houses_ids: List[int] = []  
 
 class House(BaseModel):
     id: Optional[int] = None

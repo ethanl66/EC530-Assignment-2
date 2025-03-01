@@ -104,6 +104,14 @@ def delete_house(house_id: int):
             return {"message": "House deleted successfully"}
     raise HTTPException(status_code=404, detail="House not found")
 
+# Get houses by user ID
+@app.get("/users/{user_id}/houses", response_model=List[House])
+def get_houses_by_user(user_id: int):
+    user_houses = []
+    for house in houses_db:
+        if house.owner_id == user_id:
+            user_houses.append(house)
+    return user_houses
 
 """ ================= POSTMAN FOLLOW THIS ==================
 in Body, select raw and JSON
