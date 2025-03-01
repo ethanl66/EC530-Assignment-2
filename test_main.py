@@ -84,6 +84,19 @@ def test_delete_user():
     assert response.status_code == 200
     assert response.json() == {"message": "User deleted successfully"}
 
+def test_create_user():
+    response = client.post(
+        "/users/",
+        json = {"name": "God", "email": "god@church.com"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        'id': 1,
+        'name': 'God',
+        'email': 'god@church.com',
+        'houses_ids': [],
+    }
+
 # Add more invalid input cases
 
 
@@ -149,6 +162,40 @@ def test_delete_house():
     response = client.delete("/houses/1")
     assert response.status_code == 200
     assert response.json() == {"message": "House deleted successfully"}
+
+def test_create_house():
+    response = client.post(
+        "/houses/",
+        json = {
+            "address": "1 Heaven St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "address": "1 Heaven St.",
+        "owner_id": 1,
+        "residents_ids": [1,2]
+    }
+
+def test_create_house():
+    response = client.post(
+        "/houses/",
+        json = {
+            "address": "2 Heaven St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 2,
+        "address": "2 Heaven St.",
+        "owner_id": 1,
+        "residents_ids": [1,2]
+    }
 
 # Add more invalid input cases
 
