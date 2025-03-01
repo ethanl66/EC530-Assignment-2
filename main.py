@@ -113,6 +113,10 @@ def get_houses_by_user(user_id: int):
             user_houses.append(house)
     return user_houses
 
+
+# Make it so that updating a house's owner_id also updates the user's houses_ids
+# Make it so that updating a user's houses_ids also updates the house's owner_id
+
 """ ================= POSTMAN FOLLOW THIS ==================
 in Body, select raw and JSON
 {

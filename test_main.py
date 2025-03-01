@@ -84,19 +84,6 @@ def test_delete_user():
     assert response.status_code == 200
     assert response.json() == {"message": "User deleted successfully"}
 
-def test_create_user():
-    response = client.post(
-        "/users/",
-        json = {"name": "God", "email": "god@church.com"}
-    )
-    assert response.status_code == 200
-    assert response.json() == {
-        'id': 1,
-        'name': 'God',
-        'email': 'god@church.com',
-        'houses_ids': [],
-    }
-
 # Add more invalid input cases
 
 
@@ -162,75 +149,74 @@ def test_delete_house():
     response = client.delete("/houses/1")
     assert response.status_code == 200
     assert response.json() == {"message": "House deleted successfully"}
-
-def test_create_house():
-    response = client.post(
-        "/houses/",
-        json = {
-            "address": "1 Heaven St.",
-            "owner_id": 1,
-            "residents_ids": [1, 2]
-        }
-    )
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "address": "1 Heaven St.",
-        "owner_id": 1,
-        "residents_ids": [1,2]
-    }
-
-def test_create_house():
-    response = client.post(
-        "/houses/",
-        json = {
-            "address": "2 Heaven St.",
-            "owner_id": 1,
-            "residents_ids": [1, 2]
-        }
-    )
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 2,
-        "address": "2 Heaven St.",
-        "owner_id": 1,
-        "residents_ids": [1,2]
-    }
+    
 
 # Add more invalid input cases
 
 
 def test_add_house_to_user():
+
+    # Create 2 users and 2 houses
+    client.post(
+        "/users/",
+        json = {"name": "Adam", "email": "adam@earth.com"}
+    )
+    client.post(
+        "/users/",
+        json = {"name": "Eve", "email": "eve@earth.com"}
+    )
+    client.post(
+        "/houses/",
+        json = {
+            "address": "1 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+    client.post(
+        "/houses/",
+        json = {
+            "address": "2 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+
+
     response = client.put(
         "/users/1",
         json = {
-            "name": "Eve",
-            "email": "eve@earth.com",
+            "name": "Adam2",
+            "email": "adam2@earth.com",
             "houses_ids": [1, 2]
         }
     )
     assert response.status_code == 200
     assert response.json() == {
         "id": 1,
-        "name": "Eve",
-        "email": "eve@earth.com",
+        "name": "Adam2",
+        "email": "adam2@earth.com",
         "houses_ids": [1, 2]
     }
 
 def test_get_houses_by_user():
-    response = client.get("/users/2/houses")
+    response = client.get("/users/1/houses")
     assert response.status_code == 200
     assert response.json() == [
         {
             "id": 1,
-            "address": "1 Heaven St.",
-            "owner_id": 2,
-            "residents_ids": [
-                2
-            ]
+            "address": "1 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        },
+        {
+            "id": 2,
+            "address": "2 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
         }
     ]
 def test_get_houses_by_poor_user():
-    response = client.get("/users/1/houses")
+    response = client.get("/users/2/houses")
     assert response.status_code == 200
     assert response.json() == []
