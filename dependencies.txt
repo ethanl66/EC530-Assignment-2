@@ -1,0 +1,1 @@
+pip install flake8 pytest fastapi uvicorn typing pydantic httpx
