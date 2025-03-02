@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Union
 
 class User(BaseModel):
     id: Optional[int] = None
@@ -24,7 +24,7 @@ class Device(BaseModel):
     id: Optional[int] = None
     name: str
     type: str
-    status: dict[str, int] = {}
-    settings: dict[str, ] = {}
-    data: dict[str, ] = {}
+    status: Dict[str, int] = {}
+    settings: Dict[str, Union[str, int, bool]] = {}
+    data: Dict[str, Union[str, int, bool]] = {}
     rooms_ids: List[int] = []
