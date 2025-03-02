@@ -365,3 +365,263 @@ def test_delete_all():
     response = client.delete("/rooms/")
     assert response.status_code == 200
     assert response.json() == {"message": "All rooms deleted successfully"}
+
+
+""" ================= Test Device CRUD operations ================= """
+def test_create_device():
+
+    # A device must first need a room, which must first need a house, and a house must first need an owner user
+    client.post(
+        "/users/",
+        json = {"name": "Adam", "email": "adam@earth.com"}
+    )
+    client.post(
+        "/users/",
+        json = {"name": "Eve", "email": "eve@earth.com"}
+    )
+    client.post(
+        "/houses/",
+        json = {
+            "address": "1 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+    client.post(
+        "/houses/",
+        json = {
+            "address": "2 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+    client.post(
+        "/rooms/",
+        json = {
+            "name": "Bedroom",
+            "house_id": 1
+        }
+    )
+    client.post(
+        "/rooms/",
+        json = {
+            "name": "Kitchen",
+            "house_id": 1
+        }
+    )
+    client.post(
+        "/rooms/",
+        json = {
+            "name": "Basement",
+            "house_id": 1
+        }
+    )
+
+    response = client.post(
+        "/devices/",
+        json = {
+            "name": "Bedroom Light",
+            "type": "Smart Light",
+            "status": {
+                "power": True,
+                "timer_on": False,
+                "timer_left": 600
+                       },
+            "settings": {
+                "color": "white",
+                "brightness": 100,
+                },
+            "data": {
+                "hours_on": 5,
+                "lifespan": 10000
+                },
+            "rooms_ids": [1]
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Bedroom Light",
+        "type": "Smart Light",
+        "status": {
+            "power": True,
+            "timer_on": False,
+            "timer_left": 600
+        },
+        "settings": {
+            "color": "white",
+            "brightness": 100,
+        },
+        "data": {
+            "hours_on": 5,
+            "lifespan": 10000
+        },
+        "rooms_ids": [1]
+    }
+
+    # Room must also have a device now
+    response = client.get("/rooms/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Bedroom",
+        "house_id": 1,
+        "devices_ids": [1]
+    }
+
+
+def test_get_devices():
+    response = client.get("/devices/")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "name": "Bedroom Light",
+            "type": "Smart Light",
+            "status": {
+                "power": True,
+                "timer_on": False,
+                "timer_left": 600
+            },
+            "settings": {
+                "color": "white",
+                "brightness": 100,
+            },
+            "data": {
+                "hours_on": 5,
+                "lifespan": 10000
+            },
+            "rooms_ids": [1]
+        }
+    ]
+
+def test_get_device_by_id():
+    response = client.get("/devices/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Bedroom Light",
+        "type": "Smart Light",
+        "status": {
+            "power": True,
+            "timer_on": False,
+            "timer_left": 600
+        },
+        "settings": {
+            "color": "white",
+            "brightness": 100,
+        },
+        "data": {
+            "hours_on": 5,
+            "lifespan": 10000
+        },
+        "rooms_ids": [1]
+    }
+
+def test_update_device():
+    response = client.put(
+        "/devices/1",
+        json = {
+            "name": "Bedroom Light",
+            "type": "Smart Light",
+            "status": {
+                "power": False,
+                "timer_on": False,
+                "timer_left": 600
+            },
+            "settings": {
+                "color": "white",
+                "brightness": 100,
+            },
+            "data": {
+                "hours_on": 5,
+                "lifespan": 10000
+            },
+            "rooms_ids": [1]
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Bedroom Light",
+        "type": "Smart Light",
+        "status": {
+            "power": 0,
+            "timer_on": 0,
+            "timer_left": 600
+        },
+        "settings": {
+            "color": "white",
+            "brightness": 100,
+        },
+        "data": {
+            "hours_on": 5,
+            "lifespan": 10000
+        },
+        "rooms_ids": [1]
+    }
+
+def test_get_device_by_room():
+    response = client.get("/rooms/1/devices")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "name": "Bedroom Light",
+            "type": "Smart Light",
+            "status": {
+                "power": False,
+                "timer_on": False,
+                "timer_left": 600
+            },
+            "settings": {
+                "color": "white",
+                "brightness": 100,
+            },
+            "data": {
+                "hours_on": 5,
+                "lifespan": 10000
+            },
+            "rooms_ids": [1]
+        }
+    ]
+
+def test_get_devices_by_house():
+    response = client.get("/houses/1/devices")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "name": "Bedroom Light",
+            "type": "Smart Light",
+            "status": {
+                "power": False,
+                "timer_on": False,
+                "timer_left": 600
+            },
+            "settings": {
+                "color": "white",
+                "brightness": 100,
+            },
+            "data": {
+                "hours_on": 5,
+                "lifespan": 10000
+            },
+            "rooms_ids": [1]
+        }
+    ]
+
+def test_delete_device():
+    response = client.delete("/devices/1")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Device deleted successfully"}
+
+    # Check device deleted from room
+    response = client.get("/rooms/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Bedroom",
+        "house_id": 1,
+        "devices_ids": []
+    }
