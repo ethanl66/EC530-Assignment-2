@@ -234,3 +234,133 @@ def test_delete_all():
     response = client.delete("/houses/")
     assert response.status_code == 200
     assert response.json() == {"message": "All houses deleted successfully"}
+
+
+
+""" ================= Test Room CRUD operations ================= """
+
+def test_create_room():
+
+    # A room must first need a house, and a house must first need an owner user
+    client.post(
+        "/users/",
+        json = {"name": "Adam", "email": "adam@earth.com"}
+    )
+    client.post(
+        "/users/",
+        json = {"name": "Eve", "email": "eve@earth.com"}
+    )
+    client.post(
+        "/houses/",
+        json = {
+            "address": "1 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2]
+        }
+    )
+
+    response = client.post(
+        "/rooms/",
+        json = {
+            "name": "Living Room",
+            "house_id": 1
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Living Room",
+        "house_id": 1,
+        "devices_ids": []
+    }
+
+    # House must also have a room now
+    response = client.get("/houses/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "address": "1 Earth St.",
+        "owner_id": 1,
+        "residents_ids": [1, 2],
+        "rooms_ids": [1]
+    }
+
+def test_get_rooms():
+    response = client.get("/rooms/")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "name": "Living Room",
+            "house_id": 1,
+            "devices_ids": []
+        }
+    ]
+
+def test_get_room_by_id():
+    response = client.get("/rooms/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Living Room",
+        "house_id": 1,
+        "devices_ids": []
+    }
+
+def test_update_room():
+    response = client.put(
+        "/rooms/1",
+        json = {
+            "name": "Laundry Room",
+            "house_id": 1
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "name": "Laundry Room",
+        "house_id": 1
+    }
+
+def test_get_rooms_by_house():
+    response = client.get("/houses/1/rooms")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "id": 1,
+            "name": "Laundry Room",
+            "house_id": 1,
+            "devices_ids": []
+        }
+    ]
+
+def test_delete_room():
+    response = client.delete("/rooms/1")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Room deleted successfully"}
+
+    # Check room deleted from house
+    response = client.get("/houses/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "address": "1 Earth St.",
+        "owner_id": 1,
+        "residents_ids": [1, 2],
+        "rooms_ids": []
+    }
+
+    response = client.get("/rooms/")
+    assert response.status_code == 200
+    assert response.json() == []
+
+def test_delete_all():
+    response = client.delete("/users/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "All users deleted successfully"}
+    response = client.delete("/houses/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "All houses deleted successfully"}
+    response = client.delete("/rooms/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "All rooms deleted successfully"}

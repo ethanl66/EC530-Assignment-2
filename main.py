@@ -221,3 +221,8 @@ def delete_all_users():
 def delete_all_houses():
     houses_db.clear()
     return {"message": "All houses deleted successfully"}
+# Delete all rooms
+@app.delete("/rooms/")
+def delete_all_rooms():
+    rooms_db.clear()
+    return {"message": "All rooms deleted successfully"}
