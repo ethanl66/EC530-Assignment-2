@@ -186,11 +186,12 @@ def update_room(room_id: int, updated_room: Room):
 def delete_room(room_id: int):
     for index, room in enumerate(rooms_db):
         if room.id == room_id:
+            house_id = room.house_id
             rooms_db.pop(index)
 
             # Must also update the house's rooms_ids
             for house in houses_db:
-                if room.house_id == house.id:
+                if house_id == house.id:
                     house.rooms_ids.remove(room_id)
                     break
                 
