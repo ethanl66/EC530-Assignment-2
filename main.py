@@ -191,7 +191,7 @@ def delete_room(room_id: int):
 
             # Must also update the house's rooms_ids
             for house in houses_db:
-                if house_id == house.id:
+                if house.id == house_id:
                     house.rooms_ids.remove(room_id)
                     break
                 
