@@ -12,3 +12,19 @@ class House(BaseModel):
     address: str
     owner_id: int
     residents_ids: List[int] = []
+    rooms_ids: Optional[List[int]] = []
+
+class Room(BaseModel):
+    id: Optional[int] = None
+    name: str
+    house_id: int
+    devices_ids: Optional[List[int]] = []
+
+class Device(BaseModel):
+    id: Optional[int] = None
+    name: str
+    type: str
+    status: dict[str, int] = {}
+    settings: dict[str, ] = {}
+    data: dict[str, ] = {}
+    rooms_ids: List[int] = []

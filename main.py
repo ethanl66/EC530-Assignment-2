@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from typing import List
-from models import User, House
+from models import User, House, Room, Device
 
 app = FastAPI()
 
 # In-memory "database"
 users_db = []
 houses_db = []
+rooms_db = []
+devices_db = []
 
 """ ========================= USER CRUD OPERATIONS ========================= """
 # Get all users
@@ -132,3 +134,90 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/houses" -Method Post -Headers @{ "
     "email": "god@church.com"
 }'
 """
+
+
+""" ================= ROOM CRUD OPERATIONS ================= """
+# Get all rooms
+@app.get("/rooms/")
+def get_rooms():
+    return rooms_db
+
+# Get room by ID
+@app.get("/rooms/{room_id}")
+def get_room(room_id: int):
+    for room in rooms_db:
+        if room.id == room_id:
+            return room
+    raise HTTPException(status_code=404, detail="Room not found")
+
+# Create a new room
+@app.post("/rooms/")
+def add_room(room: Room):
+    room.id = len(rooms_db) + 1
+    rooms_db.append(room)
+
+    # Must also update the house's rooms_ids
+    for house in houses_db:
+        if house.id == room.house_id:
+            house.rooms_ids.append(room.id)
+            break
+
+    return room
+
+# Update a room
+@app.put("/rooms/{room_id}")
+def update_room(room_id: int, updated_room: Room):
+    for index, room in enumerate(rooms_db):
+        if room.id == room_id:
+            rooms_db[index] = updated_room
+            updated_room.id = room_id
+
+            # Must also update the house's rooms_ids
+            for house in houses_db:
+                if house.id == room.house_id:
+                    house.rooms_ids.append(room.id)
+                    break
+                
+            return updated_room
+    raise HTTPException(status_code=404, detail="Room not found")
+
+# Delete a room
+@app.delete("/rooms/{room_id}")
+def delete_room(room_id: int):
+    for index, room in enumerate(rooms_db):
+        if room.id == room_id:
+            rooms_db.pop(index)
+
+            # Must also update the house's rooms_ids
+            for house in houses_db:
+                if room_id in house.rooms_ids:
+                    house.rooms_ids.remove(room_id)
+                    break
+
+            return {"message": "Room deleted successfully"}
+    raise HTTPException(status_code=404, detail="Room not found")
+
+
+# Get rooms by house ID
+@app.get("/houses/{house_id}/rooms")
+def get_rooms_by_house(house_id: int):
+    house_rooms = []
+    for room in rooms_db:
+        if room.house_id == house_id:
+            house_rooms.append(room)
+    return house_rooms
+
+
+
+
+""" ================= administrative functions ================= """
+# Delete all users
+@app.delete("/users/")
+def delete_all_users():
+    users_db.clear()
+    return {"message": "All users deleted successfully"}
+# Delete all houses
+@app.delete("/houses/")
+def delete_all_houses():
+    houses_db.clear()
+    return {"message": "All houses deleted successfully"}

@@ -103,7 +103,8 @@ def test_create_house():
         "id": 1,
         "address": "1 Heaven St.",
         "owner_id": 1,
-        "residents_ids": [1,2]
+        "residents_ids": [1,2],
+        "rooms_ids": []
     }
 
 def test_get_houses():
@@ -114,7 +115,8 @@ def test_get_houses():
             "id": 1,
             "address": "1 Heaven St.",
             "owner_id": 1,
-            "residents_ids": [1,2]
+            "residents_ids": [1,2],
+            "rooms_ids": []
         }
     ]
 
@@ -125,7 +127,8 @@ def test_get_house_by_id():
         "id": 1,
         "address": "1 Heaven St.",
         "owner_id": 1,
-        "residents_ids": [1,2]
+        "residents_ids": [1,2],
+        "rooms_ids": []
     }
 
 def test_update_house():
@@ -142,7 +145,8 @@ def test_update_house():
         "id": 1,
         "address": "1 Heaven St.",
         "owner_id": 2,
-        "residents_ids": [2]
+        "residents_ids": [2],
+        "rooms_ids": []
     }
 
 def test_delete_house():
@@ -207,16 +211,26 @@ def test_get_houses_by_user():
             "id": 1,
             "address": "1 Earth St.",
             "owner_id": 1,
-            "residents_ids": [1, 2]
+            "residents_ids": [1, 2],
+            "rooms_ids": []
         },
         {
             "id": 2,
             "address": "2 Earth St.",
             "owner_id": 1,
-            "residents_ids": [1, 2]
+            "residents_ids": [1, 2],
+            "rooms_ids": []
         }
     ]
 def test_get_houses_by_poor_user():
     response = client.get("/users/2/houses")
     assert response.status_code == 200
     assert response.json() == []
+
+def test_delete_all():
+    response = client.delete("/users/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "All users deleted successfully"}
+    response = client.delete("/houses/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "All houses deleted successfully"}
