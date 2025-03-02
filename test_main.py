@@ -319,7 +319,8 @@ def test_update_room():
     assert response.json() == {
         "id": 1,
         "name": "Laundry Room",
-        "house_id": 1
+        "house_id": 1,
+        'devices_ids': [],
     }
 
 def test_get_rooms_by_house():

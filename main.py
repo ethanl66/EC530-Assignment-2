@@ -190,10 +190,10 @@ def delete_room(room_id: int):
 
             # Must also update the house's rooms_ids
             for house in houses_db:
-                if room_id in house.rooms_ids:
+                if room.house_id == house.id:
                     house.rooms_ids.remove(room_id)
                     break
-
+                
             return {"message": "Room deleted successfully"}
     raise HTTPException(status_code=404, detail="Room not found")
 
