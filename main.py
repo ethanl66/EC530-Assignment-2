@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from typing import List
-from models import User, House
+from models import User, House, Room, Device
 
 app = FastAPI()
 
 # In-memory "database"
 users_db = []
 houses_db = []
+rooms_db = []
+devices_db = []
 
 """ ========================= USER CRUD OPERATIONS ========================= """
 # Get all users
@@ -104,6 +106,18 @@ def delete_house(house_id: int):
             return {"message": "House deleted successfully"}
     raise HTTPException(status_code=404, detail="House not found")
 
+# Get houses by user ID
+@app.get("/users/{user_id}/houses", response_model=List[House])
+def get_houses_by_user(user_id: int):
+    user_houses = []
+    for house in houses_db:
+        if house.owner_id == user_id:
+            user_houses.append(house)
+    return user_houses
+
+
+# Make it so that updating a house's owner_id also updates the user's houses_ids
+# Make it so that updating a user's houses_ids also updates the house's owner_id
 
 """ ================= POSTMAN FOLLOW THIS ==================
 in Body, select raw and JSON
@@ -120,3 +134,198 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/houses" -Method Post -Headers @{ "
     "email": "god@church.com"
 }'
 """
+
+
+""" ================= ROOM CRUD OPERATIONS ================= """
+# Get all rooms
+@app.get("/rooms/")
+def get_rooms():
+    return rooms_db
+
+# Get room by ID
+@app.get("/rooms/{room_id}")
+def get_room(room_id: int):
+    for room in rooms_db:
+        if room.id == room_id:
+            return room
+    raise HTTPException(status_code=404, detail="Room not found")
+
+# Create a new room
+@app.post("/rooms/")
+def add_room(room: Room):
+    room.id = len(rooms_db) + 1
+    rooms_db.append(room)
+
+    # Must also update the house's rooms_ids
+    for house in houses_db:
+        if house.id == room.house_id:
+            house.rooms_ids.append(room.id)
+            break
+
+    return room
+
+# Update a room
+@app.put("/rooms/{room_id}")
+def update_room(room_id: int, updated_room: Room):
+    for index, room in enumerate(rooms_db):
+        if room.id == room_id:
+            rooms_db[index] = updated_room
+            updated_room.id = room_id
+
+            # Must also update the house's rooms_ids
+            for house in houses_db:
+                if house.id == room.house_id:
+                    if room.id in house.rooms_ids:
+                        house.rooms_ids.remove(room.id)
+                    house.rooms_ids.append(room.id)
+                    break
+                
+            return updated_room
+    raise HTTPException(status_code=404, detail="Room not found")
+
+# Delete a room
+@app.delete("/rooms/{room_id}")
+def delete_room(room_id: int):
+    for index, room in enumerate(rooms_db):
+        if room.id == room_id:
+            house_id = room.house_id
+            rooms_db.pop(index)
+
+            # Must also update the house's rooms_ids
+            for house in houses_db:
+                if house.id == house_id:
+                    house.rooms_ids.remove(room_id)
+                    break
+                
+            return {"message": "Room deleted successfully"}
+    raise HTTPException(status_code=404, detail="Room not found")
+
+
+# Get rooms by house ID
+@app.get("/houses/{house_id}/rooms")
+def get_rooms_by_house(house_id: int):
+    house_rooms = []
+    for room in rooms_db:
+        if room.house_id == house_id:
+            house_rooms.append(room)
+    return house_rooms
+
+
+""" ================= DEVICE CRUD OPERATIONS ================= """
+# Get all devices
+@app.get("/devices/")
+def get_devices():
+    return devices_db
+
+# Get device by ID
+@app.get("/devices/{device_id}")
+def get_device(device_id: int):
+    for device in devices_db:
+        if device.id == device_id:
+            return device
+    raise HTTPException(status_code=404, detail="Device not found")
+
+# Create a new device
+@app.post("/devices/")
+def add_device(device: Device):
+    device.id = len(devices_db) + 1
+    devices_db.append(device)
+
+    # Must also update the room's devices_ids
+    for room_id in device.rooms_ids:
+        for room in rooms_db:
+            if room.id == room_id:
+                room.devices_ids.append(device.id)
+                break
+    
+    return device
+
+# Update a device
+@app.put("/devices/{device_id}")
+def update_device(device_id: int, updated_device: Device):
+    for index, device in enumerate(devices_db):
+        if device.id == device_id:
+            devices_db[index] = updated_device
+            updated_device.id = device_id
+
+            # Must also update the room's devices_ids
+            """for room in rooms_db:
+                if room.id == device.room_id:
+                    if device.id in room.devices_ids:
+                        room.devices_ids.remove(device.id)
+                    room.devices_ids.append(device.id)
+                    break """
+            for room_id in device.rooms_ids:
+                for room in rooms_db:
+                    if room.id == room_id:
+                        if device.id in room.devices_ids:
+                            room.devices_ids.remove(device.id)
+                        room.devices_ids.append(device.id)
+                        break
+                
+            return updated_device
+    raise HTTPException(status_code=404, detail="Device not found")
+
+# Delete a device
+@app.delete("/devices/{device_id}")
+def delete_device(device_id: int):
+    for index, device in enumerate(devices_db):
+        if device.id == device_id:
+            room_ids = device.rooms_ids
+            devices_db.pop(index)
+
+            """ # Must also update the room's devices_ids
+            for room in rooms_db:
+                if room.id == room_id:
+                    room.devices_ids.remove(device_id)
+                    break """
+            for room_id in room_ids:
+                for room in rooms_db:
+                    if room.id == room_id:
+                        room.devices_ids.remove(device.id)
+                        break
+                
+            return {"message": "Device deleted successfully"}
+    raise HTTPException(status_code=404, detail="Device not found")
+
+# Get devices by room ID
+@app.get("/rooms/{room_id}/devices")
+def get_devices_by_room(room_id: int):
+    room_devices = []
+    for device in devices_db:
+        for device_room_id in device.rooms_ids:
+            if room_id == device_room_id:
+                room_devices.append(device)
+    return room_devices
+
+# Get devices by house ID
+@app.get("/houses/{house_id}/devices")
+def get_devices_by_house(house_id: int):
+    house_devices = []
+    for room in rooms_db:
+        if room.house_id == house_id:
+            for device_id in room.devices_ids:
+                for device in devices_db:
+                    if device.id == device_id:
+                        house_devices.append(device)
+    return house_devices
+
+
+
+
+""" ================= administrative functions ================= """
+# Delete all users
+@app.delete("/users/")
+def delete_all_users():
+    users_db.clear()
+    return {"message": "All users deleted successfully"}
+# Delete all houses
+@app.delete("/houses/")
+def delete_all_houses():
+    houses_db.clear()
+    return {"message": "All houses deleted successfully"}
+# Delete all rooms
+@app.delete("/rooms/")
+def delete_all_rooms():
+    rooms_db.clear()
+    return {"message": "All rooms deleted successfully"}
