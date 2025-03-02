@@ -175,6 +175,8 @@ def update_room(room_id: int, updated_room: Room):
             # Must also update the house's rooms_ids
             for house in houses_db:
                 if house.id == room.house_id:
+                    if room.id in house.rooms_ids:
+                        house.rooms_ids.remove(room.id)
                     house.rooms_ids.append(room.id)
                     break
                 
