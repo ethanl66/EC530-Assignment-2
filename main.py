@@ -106,12 +106,12 @@ def delete_house(house_id: int):
             return {"message": "House deleted successfully"}
     raise HTTPException(status_code=404, detail="House not found")
 
-# Get houses by user ID
+# Get houses by user ID (includes both owned and resident houses)
 @app.get("/users/{user_id}/houses", response_model=List[House])
 def get_houses_by_user(user_id: int):
     user_houses = []
     for house in houses_db:
-        if house.owner_id == user_id:
+        if house.owner_id == user_id or user_id in house.residents_ids:
             user_houses.append(house)
     return user_houses
 
@@ -209,6 +209,19 @@ def get_rooms_by_house(house_id: int):
         if room.house_id == house_id:
             house_rooms.append(room)
     return house_rooms
+
+# Get rooms accessible by user (from houses they own or are residents of)
+@app.get("/users/{user_id}/rooms")
+def get_rooms_by_user(user_id: int):
+    user_rooms = []
+    # Get all houses where user is owner or resident
+    for house in houses_db:
+        if house.owner_id == user_id or user_id in house.residents_ids:
+            # Get all rooms in those houses
+            for room in rooms_db:
+                if room.house_id == house.id:
+                    user_rooms.append(room)
+    return user_rooms
 
 
 """ ================= DEVICE CRUD OPERATIONS ================= """
@@ -309,6 +322,23 @@ def get_devices_by_house(house_id: int):
                     if device.id == device_id:
                         house_devices.append(device)
     return house_devices
+
+# Get devices accessible by user (from houses they own or are residents of)
+@app.get("/users/{user_id}/devices")
+def get_devices_by_user(user_id: int):
+    user_devices = []
+    # Get all houses where user is owner or resident
+    for house in houses_db:
+        if house.owner_id == user_id or user_id in house.residents_ids:
+            # Get all rooms in those houses
+            for room in rooms_db:
+                if room.house_id == house.id:
+                    # Get all devices in those rooms
+                    for device_id in room.devices_ids:
+                        for device in devices_db:
+                            if device.id == device_id:
+                                user_devices.append(device)
+    return user_devices
 
 
 

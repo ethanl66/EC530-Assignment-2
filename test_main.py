@@ -225,7 +225,23 @@ def test_get_houses_by_user():
 def test_get_houses_by_poor_user():
     response = client.get("/users/2/houses")
     assert response.status_code == 200
-    assert response.json() == []
+    # User 2 is a resident in both houses, so they should see them now
+    assert response.json() == [
+        {
+            "id": 1,
+            "address": "1 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2],
+            "rooms_ids": []
+        },
+        {
+            "id": 2,
+            "address": "2 Earth St.",
+            "owner_id": 1,
+            "residents_ids": [1, 2],
+            "rooms_ids": []
+        }
+    ]
 
 def test_delete_all():
     response = client.delete("/users/")
@@ -625,3 +641,125 @@ def test_delete_device():
         "house_id": 1,
         "devices_ids": []
     }
+
+
+""" ================= Test Collaboration Features ================= """
+def test_collaboration_setup():
+    # Clean start
+    client.delete("/users/")
+    client.delete("/houses/")
+    client.delete("/rooms/")
+    
+    # Create users: owner and collaborators  
+    client.post("/users/", json={"name": "Owner", "email": "owner@test.com"})
+    client.post("/users/", json={"name": "Resident1", "email": "resident1@test.com"})
+    client.post("/users/", json={"name": "Resident2", "email": "resident2@test.com"})
+    client.post("/users/", json={"name": "NonResident", "email": "nonresident@test.com"})
+
+    # Create house with owner and residents
+    response = client.post("/houses/", json={
+        "address": "Collaborative House",
+        "owner_id": 1,
+        "residents_ids": [1, 2, 3]  # owner + 2 residents
+    })
+    assert response.status_code == 200
+
+    # Create rooms
+    client.post("/rooms/", json={"name": "Living Room", "house_id": 1})
+    client.post("/rooms/", json={"name": "Kitchen", "house_id": 1})
+
+    # Create devices
+    client.post("/devices/", json={
+        "name": "Living Room Light",
+        "type": "Smart Light",
+        "status": {"power": True},
+        "settings": {"brightness": 80},
+        "data": {"hours_on": 2},
+        "rooms_ids": [1]
+    })
+    client.post("/devices/", json={
+        "name": "Kitchen Thermostat",  
+        "type": "Smart Thermostat",
+        "status": {"power": True},
+        "settings": {"temperature": 72},
+        "data": {"usage": 10},
+        "rooms_ids": [2]
+    })
+
+def test_residents_can_see_houses():
+    # Owner can see house
+    response = client.get("/users/1/houses")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    assert response.json()[0]["address"] == "Collaborative House"
+
+    # Resident1 can see house
+    response = client.get("/users/2/houses")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    assert response.json()[0]["address"] == "Collaborative House"
+
+    # Resident2 can see house
+    response = client.get("/users/3/houses")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    assert response.json()[0]["address"] == "Collaborative House"
+
+    # NonResident cannot see house
+    response = client.get("/users/4/houses")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+def test_residents_can_see_rooms():
+    # Owner can see rooms
+    response = client.get("/users/1/rooms")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    room_names = [room["name"] for room in response.json()]
+    assert "Living Room" in room_names
+    assert "Kitchen" in room_names
+
+    # Resident1 can see rooms
+    response = client.get("/users/2/rooms")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    room_names = [room["name"] for room in response.json()]
+    assert "Living Room" in room_names
+    assert "Kitchen" in room_names
+
+    # Resident2 can see rooms
+    response = client.get("/users/3/rooms")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+    # NonResident cannot see rooms
+    response = client.get("/users/4/rooms")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+def test_residents_can_see_devices():
+    # Owner can see devices
+    response = client.get("/users/1/devices")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    device_names = [device["name"] for device in response.json()]
+    assert "Living Room Light" in device_names
+    assert "Kitchen Thermostat" in device_names
+
+    # Resident1 can see devices
+    response = client.get("/users/2/devices")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    device_names = [device["name"] for device in response.json()]
+    assert "Living Room Light" in device_names
+    assert "Kitchen Thermostat" in device_names
+
+    # Resident2 can see devices
+    response = client.get("/users/3/devices")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+    # NonResident cannot see devices
+    response = client.get("/users/4/devices")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
